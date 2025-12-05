@@ -2,6 +2,7 @@ package com.robo.RideWithUs.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.robo.RideWithUs.DTO.RegisterDriverVehicleDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
+import com.robo.RideWithUs.DTO.UpdateDriverVehicleLocationDTO;
 import com.robo.RideWithUs.Entity.Driver;
 import com.robo.RideWithUs.Service.DriverService;
 
@@ -22,5 +24,11 @@ public class DriverController {
 	@PostMapping("/registerDriver")
 	public ResponseEntity<ResponseStructure<Driver>> registerDriver(@RequestBody RegisterDriverVehicleDTO driverVehicleDTO) {
 		return driverService.registerDriver(driverVehicleDTO);
+	}
+	
+	@PatchMapping("/updatedrivervehiclelocation")
+	public void UpdateDriverVehicleLocation(@RequestBody UpdateDriverVehicleLocationDTO updatelocation) {
+		
+		driverService.UpdateDriverVehicleLocation(updatelocation);
 	}
 }

@@ -11,15 +11,22 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.robo.RideWithUs.DTO.RegisterDriverVehicleDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
+import com.robo.RideWithUs.DTO.UpdateDriverVehicleLocationDTO;
 import com.robo.RideWithUs.Entity.Driver;
 import com.robo.RideWithUs.Entity.Vehicle;
+import com.robo.RideWithUs.Exceptions.DriverNotFoundExceptionForthisNumber;
+import com.robo.RideWithUs.Exceptions.VehicleNotFoundException;
 import com.robo.RideWithUs.Repository.DriverRepository;
+import com.robo.RideWithUs.Repository.VehicleRepository;
 
 @Service
 public class DriverService {
 	
 	@Autowired
 	DriverRepository driverRepository;
+	
+	@Autowired
+	VehicleRepository vehiclerepository;
 
 	public ResponseEntity<ResponseStructure<Driver>> registerDriver(RegisterDriverVehicleDTO driverVehicleDTO) {
 
@@ -103,6 +110,36 @@ public class DriverService {
 			
 
 		return "Unkown";
+	}
+
+	public ResponseEntity<ResponseStructure<Vehicle>> UpdateDriverVehicleLocation(UpdateDriverVehicleLocationDTO updatelocation) {
+	    
+	    // 1. Find driver using mobile number
+	    Driver driver = driverRepository.findByMobileNumber(updatelocation.getDriverMobileNumber())
+	            .orElseThrow(() -> new DriverNotFoundExceptionForthisNumber());
+
+	    // 2. Get the vehicle linked to driver
+	    Vehicle vehicle = driver.getVehicle();
+	    if (vehicle == null) {
+	        throw new VehicleNotFoundException();
+	    }
+
+	    // 3. Convert coordinates into city
+	    String city = getLocation(updatelocation.getLatitude(), updatelocation.getLongitude());
+
+	    // 4. Update only the city
+	    vehicle.setCity(city);
+
+	    // 5. Save (this will NOT give error now)
+	    Vehicle updatedvehicle = vehiclerepository.save(vehicle);
+
+	    // Response
+	    ResponseStructure<Vehicle> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.ACCEPTED.value());
+	    response.setMessage("Vehicle Location updated successfully");
+	    response.setData(updatedvehicle);
+
+	    return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	}
 
 }
