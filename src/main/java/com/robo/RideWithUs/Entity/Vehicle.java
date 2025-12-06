@@ -2,6 +2,7 @@ package com.robo.RideWithUs.Entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 
@@ -18,9 +19,20 @@ public class Vehicle {
 	private String city;
 	private String availabilityStatus = "available";
 	private double pricePerKM;
+	private int averageSpeed;
 	
+	public int getAverageSpeed() {
+		return averageSpeed;
+	}
+
+	public void setAverageSpeed(int averageSpeed) {
+		this.averageSpeed = averageSpeed;
+	}
+
 	@OneToOne
-	@MapsId
+	@MapsId  //to get same id of driver id
+	@JoinColumn(name = "driver_id")
+//	@JsonIgnore //to avoid nested objects inside driver especially in response (JSON) postman
 	private Driver driver;
 
 	public int getId() {
@@ -103,8 +115,10 @@ public class Vehicle {
 		this.driver = driver;
 	}
 
+	
+
 	public Vehicle(int id, String brandName, String vehicleNumber, String type, String modal, int capacity, String city,
-			String availabilityStatus, double pricePerKM, Driver driver) {
+			String availabilityStatus, double pricePerKM, int averageSpeed, Driver driver) {
 		super();
 		this.id = id;
 		this.brandName = brandName;
@@ -115,6 +129,7 @@ public class Vehicle {
 		this.city = city;
 		this.availabilityStatus = availabilityStatus;
 		this.pricePerKM = pricePerKM;
+		this.averageSpeed = averageSpeed;
 		this.driver = driver;
 	}
 
@@ -122,12 +137,6 @@ public class Vehicle {
 		super();
 	}
 
-	@Override
-	public String toString() {
-		return "Vehicle [id=" + id + ", brandName=" + brandName + ", vehicleNumber=" + vehicleNumber + ", type=" + type
-				+ ", modal=" + modal + ", capacity=" + capacity + ", city=" + city + ", availabilityStatus="
-				+ availabilityStatus + ", pricePerKM=" + pricePerKM + ", driver=" + driver + "]";
-	}
 	
 	
 }

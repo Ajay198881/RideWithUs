@@ -8,4 +8,5 @@ import com.robo.RideWithUs.Entity.Vehicle;
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Integer>{
 
+	
 }

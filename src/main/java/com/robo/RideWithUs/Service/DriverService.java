@@ -1,14 +1,12 @@
 package com.robo.RideWithUs.Service;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
+
+import com.robo.RideWithUs.DAO.GetLocation;
 import com.robo.RideWithUs.DTO.RegisterDriverVehicleDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.DTO.UpdateDriverVehicleLocationDTO;
@@ -27,6 +25,9 @@ public class DriverService {
 	
 	@Autowired
 	VehicleRepository vehiclerepository;
+	
+	@Autowired
+	GetLocation getLocation;
 
 	public ResponseEntity<ResponseStructure<Driver>> registerDriver(RegisterDriverVehicleDTO driverVehicleDTO) {
 
@@ -49,7 +50,10 @@ public class DriverService {
 		vehicle.setModal(driverVehicleDTO.getVehicleModel());
 		vehicle.setCapacity(driverVehicleDTO.getCapacity());
 		vehicle.setPricePerKM(driverVehicleDTO.getPriceperKilometer());
-		String city = getLocation(driverVehicleDTO.getLatitude(), driverVehicleDTO.getLongitude());
+		vehicle.setAverageSpeed(driverVehicleDTO.getAverageSpeed());
+		
+		
+		String city = getLocation.getLocation(driverVehicleDTO.getLatitude(), driverVehicleDTO.getLongitude());
 		vehicle.setCity(city);
 		
 		vehicle.setDriver(driver);  
@@ -68,49 +72,7 @@ public class DriverService {
 
 	}
 
-	private final RestTemplate restTemplate = new RestTemplate();
-	private final String apikey = "pk.9f97384d7176ae66c2b751ed432be655";
-
-	public String getLocation(double latitude, double longitude) {
-
-		
-		String url = UriComponentsBuilder.fromUriString("https://us1.locationiq.com/v1/reverse")
-				.queryParam("key", apikey).queryParam("lat", latitude).queryParam("lon", longitude)
-				.queryParam("format", "json").build().toUriString();
-
-
-		System.err.println(url);
-		
-		try {
-		    Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-		    System.out.println(response);
-		    Map<String, Object> address = (Map<String, Object>) response.get("address");
-
-		   //  Full fallback order
-		    String[] keys = {
-		        "city", 
-		        "town", 
-		        "village", 
-		        "municipality",
-		        "county",
-		        "state_district",
-		        "suburb"
-		    };
-
-		    for (String key : keys) {
-		        if (address.get(key) != null) {
-		            return address.get(key).toString();
-		        }
-		    }
-//			
-		} catch (Exception ex) {
-		    System.out.println("ERROR: " + ex.getMessage());
-		}
-
-			
-
-		return "Unkown";
-	}
+	
 
 	public ResponseEntity<ResponseStructure<Vehicle>> UpdateDriverVehicleLocation(UpdateDriverVehicleLocationDTO updatelocation) {
 	    
@@ -125,7 +87,7 @@ public class DriverService {
 	    }
 
 	    // 3. Convert coordinates into city
-	    String city = getLocation(updatelocation.getLatitude(), updatelocation.getLongitude());
+	    String city = getLocation.getLocation(updatelocation.getLatitude(), updatelocation.getLongitude());
 
 	    // 4. Update only the city
 	    vehicle.setCity(city);
@@ -140,6 +102,33 @@ public class DriverService {
 	    response.setData(updatedvehicle);
 
 	    return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+	}
+
+	public ResponseEntity<ResponseStructure<Driver>> findbyDriverID(long mobileNo) {
+		
+		Driver driver = driverRepository.findByMobileNumber(mobileNo).orElseThrow(()->new DriverNotFoundExceptionForthisNumber());
+		  
+		// Response
+	    ResponseStructure<Driver> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.FOUND.value());
+	    response.setMessage("Driver Found successfully");
+	    response.setData(driver);
+
+	    return new ResponseEntity<ResponseStructure<Driver>>(response, HttpStatus.FOUND);
+	}
+
+	public ResponseEntity<ResponseStructure<Driver>> deleteDriverbyID(long mobileNo) {
+		
+		Driver driver = driverRepository.findByMobileNumber(mobileNo).orElseThrow(()->new DriverNotFoundExceptionForthisNumber());
+		
+		driverRepository.delete(driver);
+		// Response
+	    ResponseStructure<Driver> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.MOVED_PERMANENTLY.value());
+	    response.setMessage("Driver deleted successfully");
+	    response.setData(driver);
+
+	    return new ResponseEntity<ResponseStructure<Driver>>(response, HttpStatus.MOVED_PERMANENTLY);
 	}
 
 }
