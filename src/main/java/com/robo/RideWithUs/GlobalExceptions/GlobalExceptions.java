@@ -95,4 +95,16 @@ public class GlobalExceptions {
 	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.BAD_REQUEST);
 		
 	}
+	
+	@ExceptionHandler(com.robo.RideWithUs.Exceptions.DistanceDurationAPIFailedException.class)
+	public ResponseEntity<ResponseStructure<String>> DistanceDurationAPIFailedException(com.robo.RideWithUs.Exceptions.DistanceDurationAPIFailedException ex) {
+		
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+	    response.setMessage("API will not giving the Duration&Distance");
+	    response.setData("API will not giving the Duration&Distance");
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.BAD_REQUEST);
+		
+	}
 }

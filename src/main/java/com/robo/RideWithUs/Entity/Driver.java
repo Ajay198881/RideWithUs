@@ -1,5 +1,7 @@
 package com.robo.RideWithUs.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +26,7 @@ public class Driver {
 	
 	
 	 @OneToOne(mappedBy = "driver", cascade = CascadeType.ALL)
+	 @JsonManagedReference
 	private Vehicle vehicle;
 	
 	

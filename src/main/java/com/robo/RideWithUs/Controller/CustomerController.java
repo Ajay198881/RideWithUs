@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.robo.RideWithUs.DTO.AvailableVehicleDTO;
 import com.robo.RideWithUs.DTO.CustomerRegisterDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.Entity.Customer;
@@ -38,10 +39,10 @@ public class CustomerController {
 		
 	}
 	
-	@GetMapping("/seeallAvailablevehicle/{mobileNumber}")
-	public ResponseEntity<ResponseStructure<List<Vehicle>>> sellAllAvailableVehicles(@PathVariable long mobileNumber) {
+	@GetMapping("/seeallAvailablevehicle/{mobileNumber}/{city}")
+	public ResponseEntity<ResponseStructure<AvailableVehicleDTO>> sellAllAvailableVehicles(@PathVariable long mobileNumber, @PathVariable String city) {
 		
-		return customerservice.sellAllAvailableVehicles(mobileNumber);
+		return customerservice.sellAllAvailableVehicles(mobileNumber, city);
 	}
 	
 	@DeleteMapping("deleteCustomer/{mobileNumber}")

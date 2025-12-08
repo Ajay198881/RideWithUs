@@ -1,5 +1,7 @@
 package com.robo.RideWithUs.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -32,7 +34,7 @@ public class Vehicle {
 	@OneToOne
 	@MapsId  //to get same id of driver id
 	@JoinColumn(name = "driver_id")
-//	@JsonIgnore //to avoid nested objects inside driver especially in response (JSON) postman
+	@JsonBackReference
 	private Driver driver;
 
 	public int getId() {
