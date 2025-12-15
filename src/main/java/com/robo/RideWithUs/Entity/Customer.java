@@ -22,11 +22,22 @@ public class Customer {
 	private long mobileNumber;
 	private String cutomerEmailID;
 	private String customerCurrentLocation;
+	private boolean activeBookingFlag=false;
+	private String role="CUSTOMER";
 	
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 	private List<Bookings> bookingslist;
 
 	
+	public boolean isActiveBookingFlag() {
+		return activeBookingFlag;
+	}
+	public void setActiveBookingFlag(boolean activeBookingFlag) {
+		this.activeBookingFlag = activeBookingFlag;
+	}
+	public long getMobileNumber() {
+		return mobileNumber;
+	}
 	public int getId() {
 		return id;
 	}
@@ -75,16 +86,28 @@ public class Customer {
 	public void setBookingslist(List<Bookings> bookingslist) {
 		this.bookingslist = bookingslist;
 	}
+	
+	
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
 	public Customer(int id, String customerName, int cutomerAge, String customerGender, long mobileNumber,
-			String cutomerEmailID, String customerCurrentLocation, List<Bookings> bookingslist) {
+			String cutomerEmailID, String customerCurrentLocation, boolean activeBookingFlag, String role,
+			List<Bookings> bookingslist) {
 		super();
 		this.id = id;
 		this.customerName = customerName;
 		this.cutomerAge = cutomerAge;
 		this.customerGender = customerGender;
-		this.mobileNumber=mobileNumber;
+		this.mobileNumber = mobileNumber;
 		this.cutomerEmailID = cutomerEmailID;
 		this.customerCurrentLocation = customerCurrentLocation;
+		this.activeBookingFlag = activeBookingFlag;
+		this.role = role;
 		this.bookingslist = bookingslist;
 	}
 	public Customer() {

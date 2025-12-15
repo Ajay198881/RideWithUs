@@ -1,5 +1,7 @@
 package com.robo.RideWithUs.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -7,13 +9,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.robo.RideWithUs.DTO.BookingHistoryDTO;
 import com.robo.RideWithUs.DTO.RegisterDriverVehicleDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.DTO.UpdateDriverVehicleLocationDTO;
+import com.robo.RideWithUs.Entity.Bookings;
 import com.robo.RideWithUs.Entity.Driver;
 import com.robo.RideWithUs.Entity.Vehicle;
 import com.robo.RideWithUs.Service.DriverService;
@@ -47,5 +53,16 @@ public class DriverController {
 	public ResponseEntity<ResponseStructure<Driver>> deleteDriverbyID(@PathVariable long mobileNo) {
 		return driverService.deleteDriverbyID(mobileNo);
 
+	}
+	
+	@GetMapping("/seeDriverBookingHistory")
+	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeDriverBookingHistory(@RequestParam long mobileNo) {
+		return driverService.seeDriverBookingHistory(mobileNo);
+	}
+	
+	
+	@PutMapping("completeRide/{bookingId}/{payType}")
+	public void completeRide(@RequestParam int bookingId, @RequestParam String payType) {
+		driverService.completeRide(bookingId,payType);
 	}
 }

@@ -1,20 +1,34 @@
 package com.robo.RideWithUs.Service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.client.RestTemplate;
 
 import com.robo.RideWithUs.DAO.GetLocation;
+import com.robo.RideWithUs.DTO.BookingHistoryDTO;
+import com.robo.RideWithUs.DTO.QRCodeDTO;
 import com.robo.RideWithUs.DTO.RegisterDriverVehicleDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
+import com.robo.RideWithUs.DTO.RideDetailDTO;
+import com.robo.RideWithUs.DTO.SuccessfullRideDTO;
 import com.robo.RideWithUs.DTO.UpdateDriverVehicleLocationDTO;
+import com.robo.RideWithUs.Entity.Bookings;
+import com.robo.RideWithUs.Entity.Customer;
 import com.robo.RideWithUs.Entity.Driver;
+import com.robo.RideWithUs.Entity.Payment;
 import com.robo.RideWithUs.Entity.Vehicle;
+import com.robo.RideWithUs.Exceptions.BookingNotFoundException;
 import com.robo.RideWithUs.Exceptions.DriverNotFoundExceptionForthisNumber;
+import com.robo.RideWithUs.Exceptions.DriverNotFoundWithMobileNumberException;
 import com.robo.RideWithUs.Exceptions.VehicleNotFoundException;
+import com.robo.RideWithUs.Repository.BookingRepository;
+import com.robo.RideWithUs.Repository.CustomerRepository;
 import com.robo.RideWithUs.Repository.DriverRepository;
+import com.robo.RideWithUs.Repository.PaymentRepository;
 import com.robo.RideWithUs.Repository.VehicleRepository;
 
 @Service
@@ -28,6 +42,15 @@ public class DriverService {
 	
 	@Autowired
 	GetLocation getLocation;
+	
+	@Autowired
+	CustomerRepository customerRepository;
+	
+	@Autowired
+	BookingRepository bookingRepository;
+	
+	@Autowired
+	PaymentRepository paymentRepository;
 
 	public ResponseEntity<ResponseStructure<Driver>> registerDriver(RegisterDriverVehicleDTO driverVehicleDTO) {
 
@@ -130,5 +153,131 @@ public class DriverService {
 
 	    return new ResponseEntity<ResponseStructure<Driver>>(response, HttpStatus.MOVED_PERMANENTLY);
 	}
+
+
+
+	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeDriverBookingHistory(long mobileNo) {
+		
+		Driver driver = driverRepository.findByMobileNumber(mobileNo).orElseThrow(()-> new DriverNotFoundWithMobileNumberException());
+		
+		List<Bookings> bookings = bookingRepository.findByVehicle_Driver_MobileNumberAndBookingStatus(mobileNo,"COMPLETED");
+		
+		double totalAmount = 0;
+		
+		BookingHistoryDTO bookingHistoryDTO = new BookingHistoryDTO();
+		
+		for (Bookings bookings2 : bookings) {
+			
+			RideDetailDTO dto = new RideDetailDTO();
+			dto.setDestinationLocation(bookings2.getDestinationLocation());
+			dto.setDistance(bookings2.getDistanceTravelled());
+			dto.setFare(bookings2.getFare());
+			dto.setSourceLocation(bookings2.getSourceLocation());
+			
+			bookingHistoryDTO.getRideDetailDTOs().add(dto);
+			totalAmount += bookings2.getFare();
+			
+		}
+		bookingHistoryDTO.setTotalAmount(totalAmount);
+		
+		ResponseStructure<BookingHistoryDTO> responseStructure = new ResponseStructure<BookingHistoryDTO>();
+		responseStructure.setStatusCode(HttpStatus.FOUND.value());
+		responseStructure.setMessage("Driver Booking History fetched Successfully.");
+		responseStructure.setData(bookingHistoryDTO);
+		
+		return new ResponseEntity<ResponseStructure<BookingHistoryDTO>>(responseStructure,HttpStatus.FOUND);
+	}
+
+
+
+	public void completeRide(int bookingId, String payType) {
+		
+		Bookings bookings = bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException());
+		
+		if(payType.equalsIgnoreCase("CASH")) {
+				successfullRide(bookingId, payType);
+		}
+		else {
+			rideCompletedWithUPI(bookingId, payType);
+			successfullRide(bookingId, payType);
+		}
+		
+	}
+	
+	public ResponseEntity<ResponseStructure<SuccessfullRideDTO>> successfullRide(int bookingId, String payType) {
+		
+		Bookings bookings = bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException());
+		
+		bookings.setBookingStatus("COMPLETED");
+		bookings.setPaymentStatus("PAID");
+		
+		Customer customer = bookings.getCustomer();
+		customer.setActiveBookingFlag(false);
+		
+		Vehicle vehicle = bookings.getVehicle();
+		vehicle.setAvailabilityStatus("AVAILABLE");
+		
+		//OR CALL THE UPDATE VEHILCEDRIVERLOCATION METHOD(LATI,LONGI,MOBILE)
+		vehicle.setCity(bookings.getDestinationLocation());
+		
+		Payment payment = new Payment();
+		payment.setAmount(bookings.getFare());
+		payment.setBookings(bookings);
+		payment.setCustomer(customer);
+		payment.setPaymentType(payType);
+		payment.setVehicle(vehicle);
+		
+		bookingRepository.save(bookings);
+		customerRepository.save(customer);
+		vehiclerepository.save(vehicle);
+		paymentRepository.save(payment);
+		
+		SuccessfullRideDTO dto = new SuccessfullRideDTO();
+		dto.setBookings(bookings);
+		dto.setCustomer(customer);
+		dto.setPayment(payment);
+		dto.setVehicle(vehicle);
+		
+		
+		ResponseStructure<SuccessfullRideDTO> responseStructure = new ResponseStructure<SuccessfullRideDTO>();
+		responseStructure.setStatusCode(HttpStatus.ACCEPTED.value());
+		responseStructure.setMessage("Ride Completed Successfully /nTHANK YOU");
+		responseStructure.setData(dto);
+		
+		return new ResponseEntity<ResponseStructure<SuccessfullRideDTO>>(responseStructure, HttpStatus.ACCEPTED);
+	
+	}
+	
+	public ResponseEntity<ResponseStructure<QRCodeDTO>> rideCompletedWithUPI(int bookingId, String payType) {
+		
+		Bookings bookings = bookingRepository.findById(bookingId).orElseThrow(()-> new BookingNotFoundException()); 
+		
+		Driver driver = bookings.getVehicle().getDriver();
+		String upiID = driver.getUpiID();
+		double amount = bookings.getFare();
+		
+		
+		String qrUPI = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa="+upiID;
+		
+		RestTemplate restTemplate = new RestTemplate();
+		
+		byte[] qrCode = restTemplate.getForObject(qrUPI, byte[].class);
+		
+		QRCodeDTO dto = new QRCodeDTO();
+		dto.setFare(amount);
+		dto.setQrcode(qrCode);
+		
+		ResponseStructure<QRCodeDTO> responseStructure = new ResponseStructure<QRCodeDTO>();
+		responseStructure.setStatusCode(HttpStatus.ACCEPTED.value());
+		responseStructure.setMessage("QR code generated successfully for payment");
+		responseStructure.setData(dto);
+		
+		return new ResponseEntity<ResponseStructure<QRCodeDTO>>(responseStructure,HttpStatus.ACCEPTED);
+		
+		
+		
+	}
+	
+	
 
 }

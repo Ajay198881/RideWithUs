@@ -8,16 +8,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.robo.RideWithUs.DAO.GetLocation;
+import com.robo.RideWithUs.DTO.ActiveBookingDTO;
 import com.robo.RideWithUs.DTO.AvailableVehicleDTO;
+import com.robo.RideWithUs.DTO.BookingHistoryDTO;
 import com.robo.RideWithUs.DTO.CustomerRegisterDTO;
 import com.robo.RideWithUs.DTO.DestinationLocationResponse;
 import com.robo.RideWithUs.DTO.Distance_Duration_Response;
 import com.robo.RideWithUs.DTO.ResponseStructure;
+import com.robo.RideWithUs.DTO.RideDetailDTO;
 import com.robo.RideWithUs.DTO.VehicleDetail;
+import com.robo.RideWithUs.Entity.Bookings;
 import com.robo.RideWithUs.Entity.Customer;
 
 import com.robo.RideWithUs.Entity.Vehicle;
 import com.robo.RideWithUs.Exceptions.CustomerNotFoundWithThisMobileNumberException;
+import com.robo.RideWithUs.Exceptions.NoActiveBookingFoundException;
+import com.robo.RideWithUs.Repository.BookingRepository;
 import com.robo.RideWithUs.Repository.CustomerRepository;
 import com.robo.RideWithUs.Repository.VehicleRepository;
 
@@ -31,6 +37,9 @@ public class CustomerService {
 
 	@Autowired
 	VehicleRepository vehicleRepository;
+	
+	@Autowired
+	BookingRepository bookingRepository;
 	
 	@Autowired
 	Distance_Duration_Service distance_Duration_Service;
@@ -176,5 +185,75 @@ public class CustomerService {
 		return new ResponseEntity<ResponseStructure<Customer>>(response, HttpStatus.FOUND);
 
 	}
+
+	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeCustomerBookingHistory(long mobileNo) {
+
+		Customer customer = customerrepository.findByMobileNumber(mobileNo).orElseThrow(()-> new CustomerNotFoundWithThisMobileNumberException());
+		
+		List<Bookings> bookings = bookingRepository.findByCustomerMobileNumberAndBookingStatus(mobileNo,"COMPLETED");
+		
+		double totalAmount = 0;
+		
+		BookingHistoryDTO bookingHistoryDTO = new BookingHistoryDTO();
+		
+		for(Bookings b : bookings) {
+			
+			RideDetailDTO dto = new RideDetailDTO();
+			dto.setDestinationLocation(b.getDestinationLocation());
+			dto.setDistance(b.getDistanceTravelled());
+			dto.setFare(b.getFare());
+			dto.setSourceLocation(b.getSourceLocation());
+			
+			totalAmount += b.getFare();
+			bookingHistoryDTO.getRideDetailDTOs().add(dto);
+		}
+		
+		bookingHistoryDTO.setTotalAmount(totalAmount);
+		
+		ResponseStructure<BookingHistoryDTO> responseStructure = new ResponseStructure<BookingHistoryDTO>();
+		responseStructure.setStatusCode(HttpStatus.FOUND.value());
+		responseStructure.setMessage("Booking History Fetched Successfully.");
+		responseStructure.setData(bookingHistoryDTO);
+		
+		return new ResponseEntity<ResponseStructure<BookingHistoryDTO>>(responseStructure,HttpStatus.FOUND);
+		
+	}
+
+	
+	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(long mobileNo) {
+		
+		Customer customer = customerrepository.findByMobileNumber(mobileNo).orElseThrow(()-> new CustomerNotFoundWithThisMobileNumberException());
+		
+		if(customer.isActiveBookingFlag()) {
+		
+		ActiveBookingDTO activeBookingDTO = new ActiveBookingDTO();
+		activeBookingDTO.setCustomerName(customer.getCustomerName());
+		activeBookingDTO.setCustomerMobileNo(mobileNo);
+		activeBookingDTO.setCurrentLocation(customer.getCustomerCurrentLocation());
+		Bookings bookings = bookingRepository.findFirstByCustomerMobileNumberAndBookingStatus(mobileNo,"ONGOING");
+		if(bookings == null) {
+			throw new NoActiveBookingFoundException();
+		}
+		activeBookingDTO.setBookings(bookings);
+		
+		ResponseStructure<ActiveBookingDTO> responseStructure = new ResponseStructure<ActiveBookingDTO>();
+		responseStructure.setStatusCode(HttpStatus.FOUND.value());
+		responseStructure.setMessage("Active Booking Status");
+		responseStructure.setData(activeBookingDTO);
+		
+		return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(responseStructure,HttpStatus.NOT_FOUND);
+		
+	}
+		ResponseStructure<ActiveBookingDTO> responseStructure = new ResponseStructure<ActiveBookingDTO>();
+		responseStructure.setStatusCode(HttpStatus.FOUND.value());
+		responseStructure.setMessage("Active Booking Status");
+		responseStructure.setData(null);
+		
+		return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(responseStructure,HttpStatus.NOT_FOUND);
+		
+	}
+	
+	
+	
 
 }

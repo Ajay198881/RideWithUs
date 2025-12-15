@@ -1,45 +1,65 @@
 package com.robo.RideWithUs.DTO;
 
+
 public class BookVehicelDTO {
 
-	private long customerMobileNumber;
-	private long driverMobileNumber;
-	private double longitude;
-	private double latitude;
-	public long getCustomerMobileNumber() {
-		return customerMobileNumber;
+	private int vehicleID;
+	private String sourceLocation;
+	private String destinationLocation;
+	private int fare;
+	private int estiamtedTime;
+	private int distanceTravelled;
+	
+	
+	public int getVehicleID() {
+		return vehicleID;
 	}
-	public void setCustomerMobileNumber(long customerMobileNumber) {
-		this.customerMobileNumber = customerMobileNumber;
+	public void setVehicleID(int vehicleID) {
+		this.vehicleID = vehicleID;
 	}
-	public long getDriverMobileNumber() {
-		return driverMobileNumber;
+	public String getSourceLocation() {
+		return sourceLocation;
 	}
-	public void setDriverMobileNumber(long driverMobileNumber) {
-		this.driverMobileNumber = driverMobileNumber;
+	public void setSourceLocation(String sourceLocation) {
+		this.sourceLocation = sourceLocation;
 	}
-	public double getLongitude() {
-		return longitude;
+	public String getDestinationLocation() {
+		return destinationLocation;
 	}
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
+	public void setDestinationLocation(String destinationLocation) {
+		this.destinationLocation = destinationLocation;
 	}
-	public double getLatitude() {
-		return latitude;
+	public int getFare() {
+		return fare;
 	}
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
+	public void setFare(int fare) {
+		this.fare = fare;
 	}
-	public BookVehicelDTO(long customerMobileNumber, long driverMobileNumber, double longitude, double latitude) {
+	public int getEstiamtedTime() {
+		return estiamtedTime;
+	}
+	public void setEstiamtedTime(int estiamtedTime) {
+		this.estiamtedTime = estiamtedTime;
+	}
+	public int getDistanceTravelled() {
+		return distanceTravelled;
+	}
+	public void setDistanceTravelled(int distanceTravelled) {
+		this.distanceTravelled = distanceTravelled;
+	}
+	
+	public BookVehicelDTO(int vehicleID, String sourceLocation, String destinationLocation, int fare, int estiamtedTime, int distanceTravelled) {
 		super();
-		this.customerMobileNumber = customerMobileNumber;
-		this.driverMobileNumber = driverMobileNumber;
-		this.longitude = longitude;
-		this.latitude = latitude;
+		this.vehicleID = vehicleID;
+		this.sourceLocation = sourceLocation;
+		this.destinationLocation = destinationLocation;
+		this.fare = fare;
+		this.estiamtedTime = estiamtedTime;
+		this.distanceTravelled = distanceTravelled;
 	}
 	public BookVehicelDTO() {
 		super();
 	}
-	
-	
+
+		
 }

@@ -1,6 +1,7 @@
 package com.robo.RideWithUs.DTO;
 
 public class RegisterDriverVehicleDTO {
+	
 	private String licenseNumber;
 	private String upiID;
 	private String driverName;

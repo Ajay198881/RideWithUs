@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.Exceptions.APIwillNotGivingTheLocationException;
+import com.robo.RideWithUs.Exceptions.DriverNotAvailableException;
+import com.robo.RideWithUs.Exceptions.IncorrectLocationException;
+import com.robo.RideWithUs.Exceptions.NoActiveBookingFoundException;
 
 
 @RestControllerAdvice
@@ -107,4 +110,48 @@ public class GlobalExceptions {
 	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.BAD_REQUEST);
 		
 	}
+	
+	@ExceptionHandler(IncorrectLocationException.class)
+	public ResponseEntity<ResponseStructure<String>> incorrectLocationException() {
+		
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+	    response.setMessage("Location Entered is incorrect.");
+	    response.setData("PROVIDE VALID LOCATION");
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NoActiveBookingFoundException.class)
+	public ResponseEntity<ResponseStructure<String>> noActiveBookingFoundException() {
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+	    response.setMessage("NoActiveBookingFoundException");
+	    response.setData(null);
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.BAD_REQUEST);
+		
+	}
+	
+	@ExceptionHandler(com.robo.RideWithUs.Exceptions.VehicleNotAvailableException.class)
+	public ResponseEntity<ResponseStructure<String>> VehicleNotAvailableException() {
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+	    response.setMessage("Sorry! Vehilce Already Booked");
+	    response.setData(null);
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(DriverNotAvailableException.class)
+	public ResponseEntity<ResponseStructure<String>> driverNotAvailableException() {
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.EARLY_HINTS.value());
+	    response.setMessage("Sorry! for the inconvenience Driver Not Available");
+	    response.setData(null);
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.EARLY_HINTS);
+	}
 }
+
+
