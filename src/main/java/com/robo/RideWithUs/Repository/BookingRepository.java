@@ -1,5 +1,6 @@
 package com.robo.RideWithUs.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,16 @@ public interface BookingRepository extends JpaRepository<Bookings, Integer>{
 
     // Driver booking history
     List<Bookings> findByVehicle_Driver_MobileNumberAndBookingStatus(long mobileNo, String bookingStatus);
+
+	List<Bookings> findByDriverIdAndBookingDateAndBookingStatus(int driverID, LocalDateTime now, String string);
+	
+	int countByDriverIdAndBookingStatusAndBookingDateBetween(
+	        int driverId,
+	        String bookingStatus,
+	        LocalDateTime start,
+	        LocalDateTime end
+	);
+
     
 }
 

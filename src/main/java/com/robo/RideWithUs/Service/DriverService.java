@@ -1,5 +1,7 @@
 package com.robo.RideWithUs.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import com.robo.RideWithUs.Entity.Driver;
 import com.robo.RideWithUs.Entity.Payment;
 import com.robo.RideWithUs.Entity.Vehicle;
 import com.robo.RideWithUs.Exceptions.BookingNotFoundException;
+import com.robo.RideWithUs.Exceptions.DriverNotFoundException;
 import com.robo.RideWithUs.Exceptions.DriverNotFoundExceptionForthisNumber;
 import com.robo.RideWithUs.Exceptions.DriverNotFoundWithMobileNumberException;
 import com.robo.RideWithUs.Exceptions.VehicleNotFoundException;
@@ -30,6 +33,8 @@ import com.robo.RideWithUs.Repository.CustomerRepository;
 import com.robo.RideWithUs.Repository.DriverRepository;
 import com.robo.RideWithUs.Repository.PaymentRepository;
 import com.robo.RideWithUs.Repository.VehicleRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class DriverService {
@@ -221,7 +226,7 @@ public class DriverService {
 		vehicle.setCity(bookings.getDestinationLocation());
 		
 		Payment payment = new Payment();
-		payment.setAmount(bookings.getFare());
+		payment.setAmount(bookings.getFare()+customer.getPenalty());
 		payment.setBookings(bookings);
 		payment.setCustomer(customer);
 		payment.setPaymentType(payType);
@@ -254,7 +259,7 @@ public class DriverService {
 		
 		Driver driver = bookings.getVehicle().getDriver();
 		String upiID = driver.getUpiID();
-		double amount = bookings.getFare();
+		double amount = bookings.getFare()+bookings.getCustomer().getPenalty();
 		
 		
 		String qrUPI = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa="+upiID;
@@ -276,6 +281,54 @@ public class DriverService {
 		
 		
 		
+	}
+
+
+	@Transactional
+	public ResponseEntity<ResponseStructure<Bookings>> cancelBookingByDriver(int driverID, int bookingID) {
+		
+		Bookings booking = bookingRepository.findById(bookingID).orElseThrow(()-> new BookingNotFoundException()); 
+		Driver driver = driverRepository.findById(driverID).orElseThrow(()-> new DriverNotFoundException());
+		
+		 // ✅ Prevent double cancellation
+	    if (booking.getBookingStatus().startsWith("CANCELLED")) {
+	        throw new RuntimeException("Booking already cancelled");
+	    }
+
+	    // ✅ Count today's driver cancellations
+	    LocalDate today = LocalDate.now();
+	    int cancelledCount = bookingRepository
+	            .countByDriverIdAndBookingStatusAndBookingDateBetween(
+	                    driverID,
+	                    "CANCELLED BY DRIVER",
+	                    today.atStartOfDay(),
+	                    today.plusDays(1).atStartOfDay()
+	            );
+
+	    // ✅ Cancel booking
+	    booking.setBookingStatus("CANCELLED BY DRIVER");
+
+	    // ✅ Block driver if limit exceeded
+	    if (cancelledCount + 1 >= 3) {
+	        driver.setStatus("BLOCKED");
+	    }
+
+	    // ✅ Make vehicle available
+	    Vehicle vehicle = driver.getVehicle();
+	    if (vehicle != null) {
+	        vehicle.setAvailabilityStatus("AVAILABLE");
+	        vehiclerepository.save(vehicle);
+	    }
+
+	    bookingRepository.save(booking);
+	    driverRepository.save(driver);
+
+	    ResponseStructure<Bookings> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.ACCEPTED.value());
+	    response.setMessage("BOOKING CANCELLED BY DRIVER");
+	    response.setData(booking);
+
+	    return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	}
 	
 	

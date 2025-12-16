@@ -21,6 +21,8 @@ import com.robo.RideWithUs.Entity.Bookings;
 import com.robo.RideWithUs.Entity.Customer;
 
 import com.robo.RideWithUs.Entity.Vehicle;
+import com.robo.RideWithUs.Exceptions.BookingNotFoundException;
+import com.robo.RideWithUs.Exceptions.CustomerNotFoundException;
 import com.robo.RideWithUs.Exceptions.CustomerNotFoundWithThisMobileNumberException;
 import com.robo.RideWithUs.Exceptions.NoActiveBookingFoundException;
 import com.robo.RideWithUs.Repository.BookingRepository;
@@ -250,6 +252,42 @@ public class CustomerService {
 		responseStructure.setData(null);
 		
 		return new ResponseEntity<ResponseStructure<ActiveBookingDTO>>(responseStructure,HttpStatus.NOT_FOUND);
+		
+	}
+
+	public ResponseEntity<ResponseStructure<Bookings>> cancelBookingByCustomer(int customerID, int bookingID) {
+		// TODO Auto-generated method stub
+		Customer customer = customerrepository.findById(customerID).orElseThrow(()-> new CustomerNotFoundException());
+		Bookings bookings = bookingRepository.findById(bookingID).orElseThrow(()-> new BookingNotFoundException());
+		
+		// Prevent double cancellation
+	    if (bookings.getBookingStatus().startsWith("CANCELLED")) {
+	        throw new RuntimeException("Booking already cancelled");
+	    }
+
+	    // Apply penalty ONLY if driver is assigned
+	    if (bookings.getVehicle().getDriver() != null) {
+	        double penalty = bookings.getFare() * 0.10;
+	        customer.setPenalty(customer.getPenalty() + penalty);
+	    }
+		
+		bookings.setBookingStatus("CANCELLED BY CUSTOMER");
+		
+		Vehicle vehicle = bookings.getVehicle();
+		vehicle.setAvailabilityStatus("AVAILABLE");
+		
+		bookingRepository.save(bookings);
+		customerrepository.save(customer);
+		vehicleRepository.save(vehicle);
+		
+		
+		ResponseStructure<Bookings> responseStructure = new ResponseStructure<Bookings>();
+		responseStructure.setStatusCode(HttpStatus.ACCEPTED.value());
+		responseStructure.setMessage("SUCCESSFULLY CANCELLED BY CUSTOMER");
+		responseStructure.setData(bookings);
+		
+		return new ResponseEntity<ResponseStructure<Bookings>>(responseStructure,HttpStatus.ACCEPTED);
+		
 		
 	}
 	

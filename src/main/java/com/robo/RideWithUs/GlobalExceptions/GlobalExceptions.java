@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.Exceptions.APIwillNotGivingTheLocationException;
+import com.robo.RideWithUs.Exceptions.CustomerNotFoundException;
 import com.robo.RideWithUs.Exceptions.DriverNotAvailableException;
 import com.robo.RideWithUs.Exceptions.IncorrectLocationException;
 import com.robo.RideWithUs.Exceptions.NoActiveBookingFoundException;
@@ -151,6 +152,19 @@ public class GlobalExceptions {
 	    response.setData(null);
 
 	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.EARLY_HINTS);
+	}
+	
+	@ExceptionHandler(CustomerNotFoundException.class)
+	public ResponseEntity<ResponseStructure<String>> CustomerNotFoundException() {
+		
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.NOT_FOUND.value());
+	    response.setMessage("Customer is Not Found With this Id");
+	    response.setData(null);
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.NOT_FOUND);
+		
+		
 	}
 }
 

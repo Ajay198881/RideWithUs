@@ -15,7 +15,7 @@ public class Customer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private Integer id;
 	private String customerName;
 	private int cutomerAge;
 	private String customerGender;
@@ -24,11 +24,18 @@ public class Customer {
 	private String customerCurrentLocation;
 	private boolean activeBookingFlag=false;
 	private String role="CUSTOMER";
+	private double penalty;
 	
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 	private List<Bookings> bookingslist;
 
 	
+	public double getPenalty() {
+		return penalty;
+	}
+	public void setPenalty(double penalty) {
+		this.penalty = penalty;
+	}
 	public boolean isActiveBookingFlag() {
 		return activeBookingFlag;
 	}
@@ -38,11 +45,8 @@ public class Customer {
 	public long getMobileNumber() {
 		return mobileNumber;
 	}
-	public int getId() {
+	public Integer getId() {
 		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
 	}
 	public String getCustomerName() {
 		return customerName;
@@ -94,9 +98,8 @@ public class Customer {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	
-	public Customer(int id, String customerName, int cutomerAge, String customerGender, long mobileNumber,
-			String cutomerEmailID, String customerCurrentLocation, boolean activeBookingFlag, String role,
+	public Customer(Integer id, String customerName, int cutomerAge, String customerGender, long mobileNumber,
+			String cutomerEmailID, String customerCurrentLocation, boolean activeBookingFlag, String role, double penalty,
 			List<Bookings> bookingslist) {
 		super();
 		this.id = id;
@@ -108,6 +111,7 @@ public class Customer {
 		this.customerCurrentLocation = customerCurrentLocation;
 		this.activeBookingFlag = activeBookingFlag;
 		this.role = role;
+		this.penalty = penalty;
 		this.bookingslist = bookingslist;
 	}
 	public Customer() {
