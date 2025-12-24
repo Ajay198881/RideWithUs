@@ -22,13 +22,13 @@ import com.robo.RideWithUs.Entity.Customer;
 import com.robo.RideWithUs.Service.CustomerService;
 
 @RestController
-@RequestMapping("/customer")
+//@RequestMapping("/customer")
 public class CustomerController {
 
 	@Autowired
 	CustomerService customerservice;
 	
-	@PostMapping("/registerCustomer")
+	@PostMapping("/auth/registerCustomer")
 	public ResponseEntity<ResponseStructure<Customer>> registerCustomer(@RequestBody CustomerRegisterDTO customerRegisterDTO) {
 		
 		return customerservice.registerCustomer(customerRegisterDTO);

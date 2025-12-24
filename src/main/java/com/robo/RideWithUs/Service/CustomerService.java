@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.robo.RideWithUs.DAO.GetLocation;
@@ -20,7 +21,7 @@ import com.robo.RideWithUs.DTO.RideDetailDTO;
 import com.robo.RideWithUs.DTO.VehicleDetail;
 import com.robo.RideWithUs.Entity.Bookings;
 import com.robo.RideWithUs.Entity.Customer;
-
+import com.robo.RideWithUs.Entity.User;
 import com.robo.RideWithUs.Entity.Vehicle;
 import com.robo.RideWithUs.Exceptions.BookingNotFoundException;
 import com.robo.RideWithUs.Exceptions.CustomerExistAlreadyException;
@@ -30,6 +31,7 @@ import com.robo.RideWithUs.Exceptions.LocationNotFoundException;
 import com.robo.RideWithUs.Exceptions.NoActiveBookingFoundException;
 import com.robo.RideWithUs.Repository.BookingRepository;
 import com.robo.RideWithUs.Repository.CustomerRepository;
+import com.robo.RideWithUs.Repository.UserRepository;
 import com.robo.RideWithUs.Repository.VehicleRepository;
 
 @Service
@@ -48,6 +50,12 @@ public class CustomerService {
 	
 	@Autowired
 	Distance_Duration_Service distance_Duration_Service;
+	
+	@Autowired
+	UserRepository userrepository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	public ResponseEntity<ResponseStructure<Customer>> registerCustomer(CustomerRegisterDTO customerRegisterDTO) {
 		
@@ -66,6 +74,21 @@ public class CustomerService {
 		customer.setCustomerCurrentLocation(
 				getLocation.getLocation(customerRegisterDTO.getLatitude(), customerRegisterDTO.getLongitude()));
 
+		User user = new User();
+		user.setMobileNumber(customerRegisterDTO.getMobileNo());
+		user.setRole("Customer");
+		
+		String encodedPassword = passwordEncoder.encode(customerRegisterDTO.getPassword());
+		user.setPassword(encodedPassword);
+		
+//		System.err.println("Raw :"+ customerRegisterDTO.getPassword());
+//		System.err.println(encodedPassword);
+		
+		
+		User saveduser = userrepository.save(user);
+		
+		customer.setUser(saveduser);
+		
 		Customer savedcustomer = customerrepository.save(customer);
 
 		// Response

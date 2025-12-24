@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.robo.RideWithUs.Configirations.PasswordConfiguration;
 import com.robo.RideWithUs.DAO.GetLocation;
 import com.robo.RideWithUs.DTO.BookingHistoryDTO;
 import com.robo.RideWithUs.DTO.DriverDeletedDTO;
@@ -23,6 +25,7 @@ import com.robo.RideWithUs.Entity.Bookings;
 import com.robo.RideWithUs.Entity.Customer;
 import com.robo.RideWithUs.Entity.Driver;
 import com.robo.RideWithUs.Entity.Payment;
+import com.robo.RideWithUs.Entity.User;
 import com.robo.RideWithUs.Entity.Vehicle;
 import com.robo.RideWithUs.Exceptions.BookingNotFoundException;
 import com.robo.RideWithUs.Exceptions.DriverAlreadyExistException;
@@ -36,6 +39,7 @@ import com.robo.RideWithUs.Repository.BookingRepository;
 import com.robo.RideWithUs.Repository.CustomerRepository;
 import com.robo.RideWithUs.Repository.DriverRepository;
 import com.robo.RideWithUs.Repository.PaymentRepository;
+import com.robo.RideWithUs.Repository.UserRepository;
 import com.robo.RideWithUs.Repository.VehicleRepository;
 
 import jakarta.transaction.Transactional;
@@ -66,6 +70,13 @@ public class DriverService {
 	
 	@Autowired
 	MailService mailService;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private UserRepository userrepository;
+
 
 	public ResponseEntity<ResponseStructure<Driver>> registerDriver(RegisterDriverVehicleDTO driverVehicleDTO) {
 		
@@ -101,6 +112,20 @@ public class DriverService {
 		
 		vehicle.setDriver(driver);  
 		driver.setVehicle(vehicle);
+		
+		User user = new User();
+		user.setMobileNumber(driverVehicleDTO.getDriverMobileNumber());
+		user.setRole("Driver");
+		
+		String encodedPassword = passwordEncoder.encode(driverVehicleDTO.getPassword());
+		user.setPassword(encodedPassword);
+		
+//		System.err.println("Raw :"+ driverVehicleDTO.getPassword());
+//		System.err.println(encodedPassword);
+		
+		User saveduser = userrepository.save(user);
+		
+		driver.setUser(saveduser);
 		
 		Driver saveddriver = driverRepository.save(driver);
 		

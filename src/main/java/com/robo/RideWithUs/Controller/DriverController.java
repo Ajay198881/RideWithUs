@@ -27,13 +27,13 @@ import com.robo.RideWithUs.Entity.Vehicle;
 import com.robo.RideWithUs.Service.DriverService;
 
 @RestController
-@RequestMapping("/driver")
+//@RequestMapping("/driver")
 public class DriverController {
 
 	@Autowired
 	DriverService driverService;
 	
-	@PostMapping("/registerDriver")
+	@PostMapping("/auth/registerDriver")
 	public ResponseEntity<ResponseStructure<Driver>> registerDriver(@RequestBody RegisterDriverVehicleDTO driverVehicleDTO) {
 		return driverService.registerDriver(driverVehicleDTO);
 	}
