@@ -23,7 +23,7 @@ public class Driver {
 	private String driverName;
 	private String status="ACTIVE";
 	private int age;
-	private long mobileNumber;
+	private String mobileNumber;
 	private String gender;
 	private String mailID;
 	private String role="DRIVER";
@@ -88,10 +88,10 @@ public class Driver {
 	public void setAge(int age) {
 		this.age = age;
 	}
-	public long getMobileNumber() {
+	public String getMobileNumber() {
 		return mobileNumber;
 	}
-	public void setMobileNumber(long mobileNumber) {
+	public void setMobileNumber(String mobileNumber) {
 		this.mobileNumber = mobileNumber;
 	}
 	public String getGender() {
@@ -121,7 +121,7 @@ public class Driver {
 	
 	
 	public Driver(int id, String licenseNumber, String upiID, String driverName, String status, int age,
-			long mobileNumber, String gender, String mailID, String role, Vehicle vehicle, List<Bookings> bookings,
+			String mobileNumber, String gender, String mailID, String role, Vehicle vehicle, List<Bookings> bookings,
 			User user) {
 		super();
 		this.id = id;

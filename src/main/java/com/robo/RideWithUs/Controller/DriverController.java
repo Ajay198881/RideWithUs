@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.robo.RideWithUs.DTO.BookingHistoryDTO;
 import com.robo.RideWithUs.DTO.DriverDeletedDTO;
 import com.robo.RideWithUs.DTO.QRCodeDTO;
-import com.robo.RideWithUs.DTO.RegisterDriverVehicleDTO;
+
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.DTO.SuccessfullRideDTO;
 import com.robo.RideWithUs.DTO.UpdateDriverVehicleLocationDTO;
@@ -27,16 +27,11 @@ import com.robo.RideWithUs.Entity.Vehicle;
 import com.robo.RideWithUs.Service.DriverService;
 
 @RestController
-//@RequestMapping("/driver")
+@RequestMapping("/driver")
 public class DriverController {
 
 	@Autowired
 	DriverService driverService;
-	
-	@PostMapping("/auth/registerDriver")
-	public ResponseEntity<ResponseStructure<Driver>> registerDriver(@RequestBody RegisterDriverVehicleDTO driverVehicleDTO) {
-		return driverService.registerDriver(driverVehicleDTO);
-	}
 	
 
 	@PatchMapping("/updatedrivervehiclelocation")
@@ -46,19 +41,19 @@ public class DriverController {
 	}
 
 	@GetMapping("/finddriverbyID/{mobileNo}")
-	public ResponseEntity<ResponseStructure<Driver>> findbydriverID(@PathVariable long mobileNo) {
+	public ResponseEntity<ResponseStructure<Driver>> findbydriverID(@PathVariable String mobileNo) {
 		
 		return driverService.findbyDriverID(mobileNo);
 	}
 	
 	@DeleteMapping("/deleteDriverbyID/{mobileNo}")
-	public ResponseEntity<ResponseStructure<DriverDeletedDTO>> deleteDriverbyID(@PathVariable long mobileNo) {
+	public ResponseEntity<ResponseStructure<DriverDeletedDTO>> deleteDriverbyID(@PathVariable String mobileNo) {
 		return driverService.deleteDriverbyID(mobileNo);
 
 	}
 	
 	@GetMapping("/seeDriverBookingHistory")
-	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeDriverBookingHistory(@RequestParam long mobileNo) {
+	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeDriverBookingHistory(@RequestParam String mobileNo) {
 		return driverService.seeDriverBookingHistory(mobileNo);
 	}
 	

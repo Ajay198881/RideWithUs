@@ -5,7 +5,7 @@ import com.robo.RideWithUs.Entity.Bookings;
 public class ActiveBookingDTO {
 
 	private String customerName;
-	private long customerMobileNo;
+	private String customerMobileNo;
 	private Bookings bookings;
 	private String currentLocation;
 	
@@ -15,10 +15,10 @@ public class ActiveBookingDTO {
 	public void setCustomerName(String customerName) {
 		this.customerName = customerName;
 	}
-	public long getCustomerMobileNo() {
+	public String getCustomerMobileNo() {
 		return customerMobileNo;
 	}
-	public void setCustomerMobileNo(long customerMobileNo) {
+	public void setCustomerMobileNo(String customerMobileNo) {
 		this.customerMobileNo = customerMobileNo;
 	}
 	public Bookings getBookings() {
@@ -33,7 +33,7 @@ public class ActiveBookingDTO {
 	public void setCurrentLocation(String currentLocation) {
 		this.currentLocation = currentLocation;
 	}
-	public ActiveBookingDTO(String customerName, long customerMobileNo, Bookings bookings, String currentLocation) {
+	public ActiveBookingDTO(String customerName, String customerMobileNo, Bookings bookings, String currentLocation) {
 		super();
 		this.customerName = customerName;
 		this.customerMobileNo = customerMobileNo;

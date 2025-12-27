@@ -4,11 +4,11 @@ public class UpdateDriverVehicleLocationDTO {
 
 	private double longitude;
 	private double latitude;
-	private long driverMobileNumber;
-	public long getDriverMobileNumber() {
+	private String driverMobileNumber;
+	public String getDriverMobileNumber() {
 		return driverMobileNumber;
 	}
-	public void setDriverMobileNumber(long driverMobileNumber) {
+	public void setDriverMobileNumber(String driverMobileNumber) {
 		this.driverMobileNumber = driverMobileNumber;
 	}
 	public double getLongitude() {
@@ -24,7 +24,7 @@ public class UpdateDriverVehicleLocationDTO {
 		this.latitude = latitude;
 	}
 	
-	public UpdateDriverVehicleLocationDTO(double longitude, double latitude, long driverMobileNumber) {
+	public UpdateDriverVehicleLocationDTO(double longitude, double latitude, String driverMobileNumber) {
 		super();
 		this.longitude = longitude;
 		this.latitude = latitude;

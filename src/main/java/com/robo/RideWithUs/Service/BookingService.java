@@ -36,12 +36,12 @@ public class BookingService {
 	@Autowired
 	MailService mailService;
 
-	private int generateOtp() {
+	protected int generateOtp() {
 		return (int) (Math.random() * 9000) + 1000;
 	}
 
 	public ResponseEntity<ResponseStructure<Bookings>> bookVehicle(
-			long mobileNo, BookVehicelDTO dto) {
+			String mobileNo, BookVehicelDTO dto) {
 
 		Customer customer = customerRepository
 				.findByMobileNumber(mobileNo)

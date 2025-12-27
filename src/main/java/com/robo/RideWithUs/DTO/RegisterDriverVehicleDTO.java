@@ -6,7 +6,7 @@ public class RegisterDriverVehicleDTO {
 	private String upiID;
 	private String driverName;
 	private int driverAge;
-	private long driverMobileNumber;
+	private String driverMobileNumber;
 	private String gender;
 	private String mailID;
 	private String vehicleName;
@@ -77,11 +77,11 @@ public class RegisterDriverVehicleDTO {
 		this.driverAge = driverAge;
 	}
 
-	public long getDriverMobileNumber() {
+	public String getDriverMobileNumber() {
 		return driverMobileNumber;
 	}
 
-	public void setDriverMobileNumber(long driverMobileNumber) {
+	public void setDriverMobileNumber(String driverMobileNumber) {
 		this.driverMobileNumber = driverMobileNumber;
 	}
 
@@ -161,7 +161,7 @@ public class RegisterDriverVehicleDTO {
 
 	
 	public RegisterDriverVehicleDTO(String licenseNumber, String upiID, String driverName, int driverAge,
-			long driverMobileNumber, String gender, String mailID, String vehicleName, String vehicleNumber,
+			String driverMobileNumber, String gender, String mailID, String vehicleName, String vehicleNumber,
 			String vehicleModel, String vehicletype, int capacity, double longitude, double latitude,
 			long priceperKilometer, int averageSpeed, String password) {
 		super();

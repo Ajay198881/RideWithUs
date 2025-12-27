@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import com.robo.RideWithUs.Configirations.PasswordConfiguration;
 import com.robo.RideWithUs.DAO.GetLocation;
 import com.robo.RideWithUs.DTO.BookingHistoryDTO;
 import com.robo.RideWithUs.DTO.DriverDeletedDTO;
@@ -206,7 +204,7 @@ public class DriverService {
 	    return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	}
 
-	public ResponseEntity<ResponseStructure<Driver>> findbyDriverID(long mobileNo) {
+	public ResponseEntity<ResponseStructure<Driver>> findbyDriverID(String mobileNo) {
 		
 		Driver driver = driverRepository.findByMobileNumber(mobileNo).orElseThrow(()->new DriverNotFoundExceptionForthisNumber());
 		  
@@ -219,7 +217,7 @@ public class DriverService {
 	    return new ResponseEntity<ResponseStructure<Driver>>(response, HttpStatus.FOUND);
 	}
 
-	public ResponseEntity<ResponseStructure<DriverDeletedDTO>> deleteDriverbyID(long mobileNo) {
+	public ResponseEntity<ResponseStructure<DriverDeletedDTO>> deleteDriverbyID(String mobileNo) {
 		
 		Driver driver = driverRepository.findByMobileNumber(mobileNo).orElseThrow(()->new DriverNotFoundExceptionForthisNumber());
 		
@@ -240,7 +238,7 @@ public class DriverService {
 
 
 
-	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeDriverBookingHistory(long mobileNo) {
+	public ResponseEntity<ResponseStructure<BookingHistoryDTO>> seeDriverBookingHistory(String mobileNo) {
 		
 		Driver driver = driverRepository.findByMobileNumber(mobileNo).orElseThrow(()-> new DriverNotFoundWithMobileNumberException());
 		

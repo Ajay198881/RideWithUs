@@ -3,7 +3,7 @@ package com.robo.RideWithUs.DTO;
 public class DriverDeletedDTO {
 
 	 private String driverName;
-	 private long mobileNumber;
+	 private String mobileNumber;
 	 private String status;
 	 public String getDriverName() {
 		 return driverName;
@@ -11,10 +11,10 @@ public class DriverDeletedDTO {
 	 public void setDriverName(String driverName) {
 		 this.driverName = driverName;
 	 }
-	 public long getMobileNumber() {
+	 public String getMobileNumber() {
 		 return mobileNumber;
 	 }
-	 public void setMobileNumber(long mobileNumber) {
+	 public void setMobileNumber(String mobileNumber) {
 		 this.mobileNumber = mobileNumber;
 	 }
 	 public String getStatus() {
@@ -23,7 +23,7 @@ public class DriverDeletedDTO {
 	 public void setStatus(String status) {
 		 this.status = status;
 	 }
-	 public DriverDeletedDTO(String driverName, long mobileNumber, String status) {
+	 public DriverDeletedDTO(String driverName, String mobileNumber, String status) {
 		super();
 		this.driverName = driverName;
 		this.mobileNumber = mobileNumber;
