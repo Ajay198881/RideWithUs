@@ -13,7 +13,7 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	private long mobileNumber;
+	private String mobileNumber;
 	private String password;
 	private String role;
 	public int getId() {
@@ -22,10 +22,10 @@ public class User {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public long getMobileNumber() {
+	public String getMobileNumber() {
 		return mobileNumber;
 	}
-	public void setMobileNumber(long mobileNumber) {
+	public void setMobileNumber(String mobileNumber) {
 		this.mobileNumber = mobileNumber;
 	}
 	public String getPassword() {
@@ -40,7 +40,7 @@ public class User {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	public User(int id, long mobileNumber, String password, String role) {
+	public User(int id, String mobileNumber, String password, String role) {
 		super();
 		this.id = id;
 		this.mobileNumber = mobileNumber;

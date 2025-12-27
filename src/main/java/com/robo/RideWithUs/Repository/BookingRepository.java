@@ -13,19 +13,19 @@ public interface BookingRepository extends JpaRepository<Bookings, Integer>{
 
 	 // Customer booking history (completed rides)
     List<Bookings> findByCustomerMobileNumberAndBookingStatus(
-            long mobileNo,
+            String mobileNo,
             String bookingStatus
     );
 
     // Customer active booking (only one)
     Bookings findFirstByCustomerMobileNumberAndBookingStatus(
-            long mobileNo,
+            String mobileNo,
             String bookingStatus
     );
 
     // Driver booking history
     List<Bookings> findByVehicle_Driver_MobileNumberAndBookingStatus(
-            long mobileNo,
+            String mobileNo,
             String bookingStatus
     );
 

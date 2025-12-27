@@ -13,5 +13,5 @@ public interface DriverRepository extends JpaRepository<Driver, Integer> {
 	
 
 
-	 Optional<Driver> findByMobileNumber(long mobileNumber);
+	 Optional<Driver> findByMobileNumber(String mobileNumber);
 }

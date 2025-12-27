@@ -5,7 +5,7 @@ public class CustomerRegisterDTO {
 	private String name;
     private int age;
     private String gender;
-    private long mobileNo;
+    private String mobileNo;
     private String email;
     private double latitude;
     private double longitude;
@@ -35,11 +35,11 @@ public class CustomerRegisterDTO {
 		this.gender = gender;
 	}
 
-	public long getMobileNo() {
+	public String getMobileNo() {
 		return mobileNo;
 	}
 
-	public void setMobileNo(long mobileNo) {
+	public void setMobileNo(String mobileNo) {
 		this.mobileNo = mobileNo;
 	}
 
@@ -77,7 +77,7 @@ public class CustomerRegisterDTO {
 	
 	
 
-	public CustomerRegisterDTO(String name, int age, String gender, long mobileNo, String email, double latitude,
+	public CustomerRegisterDTO(String name, int age, String gender, String mobileNo, String email, double latitude,
 			double longitude, String password) {
 		super();
 		this.name = name;

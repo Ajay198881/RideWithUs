@@ -18,6 +18,8 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable()) // disable csrf for APIs
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll() // public APIs
+                .requestMatchers("/customer/**").permitAll()  // 👈 allow
+                .requestMatchers("/driver/**").permitAll()  // 👈 allow
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form.permitAll())

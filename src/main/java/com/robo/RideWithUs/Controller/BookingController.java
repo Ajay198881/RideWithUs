@@ -25,7 +25,7 @@ public class BookingController {
 	MailService mailService;
 
 	@PostMapping("/bookVehicle/{mobileNo}")
-	public ResponseEntity<ResponseStructure<Bookings>> BookVehicle(@PathVariable long mobileNo, @RequestBody BookVehicelDTO bookVehicledto) {
+	public ResponseEntity<ResponseStructure<Bookings>> BookVehicle(@PathVariable String mobileNo, @RequestBody BookVehicelDTO bookVehicledto) {
 		
 		return bookingService.bookVehicle(mobileNo,bookVehicledto);
 	}
