@@ -113,7 +113,7 @@ public class DriverService {
 		
 		User user = new User();
 		user.setMobileNumber(driverVehicleDTO.getDriverMobileNumber());
-		user.setRole("Driver");
+		user.setRole("DRIVER");
 		
 		String encodedPassword = passwordEncoder.encode(driverVehicleDTO.getPassword());
 		user.setPassword(encodedPassword);

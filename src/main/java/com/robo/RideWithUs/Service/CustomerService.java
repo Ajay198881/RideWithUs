@@ -77,7 +77,7 @@ public class CustomerService {
 
 		User user = new User();
 		user.setMobileNumber(dto.getMobileNo());
-		user.setRole("Customer");
+		user.setRole("CUSTOMER");
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
 		User savedUser = userRepository.save(user);

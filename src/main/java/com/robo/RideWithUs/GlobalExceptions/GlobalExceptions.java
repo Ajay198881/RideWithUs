@@ -12,6 +12,7 @@ import com.robo.RideWithUs.Exceptions.CustomerNotFoundException;
 import com.robo.RideWithUs.Exceptions.DriverAlreadyExistException;
 import com.robo.RideWithUs.Exceptions.DriverBlockedException;
 import com.robo.RideWithUs.Exceptions.DriverNotAvailableException;
+import com.robo.RideWithUs.Exceptions.InValidCredientialsForPasswordException;
 import com.robo.RideWithUs.Exceptions.IncorrectLocationException;
 import com.robo.RideWithUs.Exceptions.InvalidOTPException;
 import com.robo.RideWithUs.Exceptions.LocationNotFoundException;
@@ -262,4 +263,33 @@ public class GlobalExceptions {
 
 		    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	 }
+	@ExceptionHandler(com.robo.RideWithUs.Exceptions.InvalidTokenException.class)
+	public ResponseEntity<ResponseStructure<String>> InvalidTokenException(com.robo.RideWithUs.Exceptions.InvalidTokenException ex) {
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.PROXY_AUTHENTICATION_REQUIRED.value());
+	    response.setMessage("Invalid Token");
+	    response.setData(null);
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
+	}
+	
+	@ExceptionHandler(InValidCredientialsForPasswordException.class)
+	public ResponseEntity<ResponseStructure<String>> InValidCredientialsForPasswordException(InValidCredientialsForPasswordException ex) {
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.PROXY_AUTHENTICATION_REQUIRED.value());
+	    response.setMessage("Invalid Password");
+	    response.setData(null);
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
+	}
+	
+	@ExceptionHandler(com.robo.RideWithUs.Exceptions.InValidRoleException.class)
+	public ResponseEntity<ResponseStructure<String>> InValidRoleException(com.robo.RideWithUs.Exceptions.InValidRoleException ex) {
+		ResponseStructure<String> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.PROXY_AUTHENTICATION_REQUIRED.value());
+	    response.setMessage("Invalid Role");
+	    response.setData(null);
+
+	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
+	}
 }

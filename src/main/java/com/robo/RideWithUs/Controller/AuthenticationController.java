@@ -34,7 +34,7 @@ public class AuthenticationController {
 	@GetMapping("/login")
 	public ResponseEntity<ResponseStructure<String>> Login(@RequestBody LoginDTO logindto) {
 		
-		return loginservice.Login(logindto);
+		return loginservice.login(logindto);
 	}
 	
 	@PostMapping("/register/Customer")
