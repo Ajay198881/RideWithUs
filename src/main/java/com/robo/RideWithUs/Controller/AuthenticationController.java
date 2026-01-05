@@ -31,7 +31,7 @@ public class AuthenticationController {
 	@Autowired
 	DriverService driverService;
 
-	@GetMapping("/login")
+	@PostMapping("/login")
 	public ResponseEntity<ResponseStructure<String>> Login(@RequestBody LoginDTO logindto) {
 		
 		return loginservice.login(logindto);
