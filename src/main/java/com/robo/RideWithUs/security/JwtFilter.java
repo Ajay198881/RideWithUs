@@ -25,57 +25,56 @@ public class JwtFilter extends OncePerRequestFilter {
 	private JwtUtils jwtUtils;
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-	                                HttpServletResponse response,
-	                                FilterChain filterChain)
-	        throws ServletException, IOException {
-
-	    String path = request.getServletPath();
-	    System.out.println("Request Path: " + path);
-
-	    // ✅ Completely bypass JWT logic for auth APIs
-	    if (path.startsWith("/auth/")) {
-	        filterChain.doFilter(request, response);
-	        return;
-	    }
-
-	    String authHeader = request.getHeader("Authorization");
-
-	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-	        filterChain.doFilter(request, response);
-	        return;
-	    }
-
-	    String token = authHeader.substring(7);
-
-	    try {
-	        String username = jwtUtils.extractUserName(token);
-	        String role = jwtUtils.extractRole(token);
-
-	        if (username != null &&
-	            SecurityContextHolder.getContext().getAuthentication() == null &&
-	            jwtUtils.isTokenValid(token, username)) {
-
-	            var authorities =
-	                    Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role));
-
-	            UsernamePasswordAuthenticationToken authToken =
-	                    new UsernamePasswordAuthenticationToken(username, null, authorities);
-
-	            authToken.setDetails(
-	                    new WebAuthenticationDetailsSource().buildDetails(request));
-
-	            SecurityContextHolder.getContext().setAuthentication(authToken);
-	        }
-
-	    } catch (Exception e) {
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	        response.getWriter().write("Invalid or Expired Token");
-	        return;
-	    }
-
-	    filterChain.doFilter(request, response);
+	protected boolean shouldNotFilter(HttpServletRequest request) {
+		return request.getServletPath().startsWith("/auth");
 	}
 
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+
+		String path = request.getServletPath();
+		System.out.println("Request Path: " + path);
+
+		// ✅ Completely bypass JWT logic for auth APIs
+		if (path.startsWith("/auth/")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		String authHeader = request.getHeader("Authorization");
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		String token = authHeader.substring(7);
+
+		try {
+			String username = jwtUtils.extractUserName(token);
+			String role = jwtUtils.extractRole(token);
+
+			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null
+					&& jwtUtils.isTokenValid(token, username)) {
+
+				var authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role));
+
+				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
+						authorities);
+
+				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+				SecurityContextHolder.getContext().setAuthentication(authToken);
+			}
+
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().write("Invalid or Expired Token");
+			return;
+		}
+
+		filterChain.doFilter(request, response);
+	}
 
 }
