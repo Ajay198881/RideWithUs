@@ -65,6 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		// Validate token and set authentication context
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			
 			String role = jwtUtils.extractRole(token); // ✅ Extract role claim (ADMIN/USER)
 
 			if (jwtUtils.isTokenValid(token, username)) {
@@ -76,8 +77,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 
-				System.err.println("Authorities set in SecurityContext: "
-						+ SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+				
+						SecurityContextHolder.getContext().setAuthentication(authToken);
 			}
 		}
 
