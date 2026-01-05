@@ -25,65 +25,57 @@ public class JwtFilter extends OncePerRequestFilter {
 	private JwtUtils jwtUtils;
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request,
+	                                HttpServletResponse response,
+	                                FilterChain filterChain)
+	        throws ServletException, IOException {
 
-		System.err.println("Request Path: " + request.getServletPath());
+	    String path = request.getServletPath();
+	    System.out.println("Request Path: " + path);
 
-		if (request.getServletPath().startsWith("/auth")) {
-			filterChain.doFilter(request, response);
-			return;
-		}
+	    // ✅ Completely bypass JWT logic for auth APIs
+	    if (path.startsWith("/auth/")) {
+	        filterChain.doFilter(request, response);
+	        return;
+	    }
 
-		String authHeader = request.getHeader("Authorization");
-		String token = null;
-		String username = null;
+	    String authHeader = request.getHeader("Authorization");
 
-		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        filterChain.doFilter(request, response);
+	        return;
+	    }
 
-			token = authHeader.substring(7);
-			System.err.println("Authorization Header = " + authHeader);
+	    String token = authHeader.substring(7);
 
-			try {
-				username = jwtUtils.extractUserName(token);
-				System.out.println("Username from token = " + username);
+	    try {
+	        String username = jwtUtils.extractUserName(token);
+	        String role = jwtUtils.extractRole(token);
 
-				String role = jwtUtils.extractRole(token);
-				System.err.println("Role from token = " + role);
+	        if (username != null &&
+	            SecurityContextHolder.getContext().getAuthentication() == null &&
+	            jwtUtils.isTokenValid(token, username)) {
 
-				boolean valid = jwtUtils.isTokenValid(token, username);
-				System.out.println("Is token valid = " + valid);
+	            var authorities =
+	                    Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role));
 
-			} catch (Exception e) {
-//				 throw new InvalidTokenException();
-				e.printStackTrace();
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				response.getWriter().write("Invalid or Expired Token");
-				return;
-			}
-		}
+	            UsernamePasswordAuthenticationToken authToken =
+	                    new UsernamePasswordAuthenticationToken(username, null, authorities);
 
-		// Validate token and set authentication context
-		if (username != null && token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			
-			String role = jwtUtils.extractRole(token); // ✅ Extract role claim (ADMIN/USER)
+	            authToken.setDetails(
+	                    new WebAuthenticationDetailsSource().buildDetails(request));
 
-			if (jwtUtils.isTokenValid(token, username)) {
-				var authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role));
+	            SecurityContextHolder.getContext().setAuthentication(authToken);
+	        }
 
-				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
-						authorities);
-				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+	    } catch (Exception e) {
+	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	        response.getWriter().write("Invalid or Expired Token");
+	        return;
+	    }
 
-				SecurityContextHolder.getContext().setAuthentication(authToken);
-
-				
-						SecurityContextHolder.getContext().setAuthentication(authToken);
-			}
-		}
-
-		filterChain.doFilter(request, response);
-
+	    filterChain.doFilter(request, response);
 	}
+
 
 }
