@@ -18,8 +18,11 @@ public class CorsConfig {
 
         config.setAllowCredentials(true);
         config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "https://*.up.railway.app"
+        		"http://localhost:5173",
+                "http://localhost:5174",
+                "http://localhost:5175",
+                "http://localhost:5176",
+                "http://localhost:5177"
         ));
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS"
