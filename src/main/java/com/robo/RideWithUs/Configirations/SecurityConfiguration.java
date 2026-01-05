@@ -23,6 +23,7 @@ public class SecurityConfiguration {
 
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> {})
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/customer/**").hasRole("CUSTOMER")
