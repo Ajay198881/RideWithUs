@@ -18,8 +18,7 @@ public class SecurityConfiguration {
 
 	  @Autowired
 	    private JwtFilter jwtFilter;
-	   @Autowired
-	  private CorsConfig corsConfig;
+	   
 
 	    @Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
