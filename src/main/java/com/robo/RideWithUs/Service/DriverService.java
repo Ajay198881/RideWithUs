@@ -132,40 +132,40 @@ public class DriverService {
 		responseStructure.setMessage("Driver saved successfully");
 		responseStructure.setData(saveddriver);
 		
-		String subject = "Welcome to RideWithUs – Driver Registration Successful";
-
-		String message = """
-		        Hello %s,
-
-		        Congratulations! 🎉
-		        You have been successfully registered as a driver with RideWithUs.
-
-		        Driver Details:
-		        ------------------------
-		        Name        : %s
-		        Mobile No   : %s
-		        Vehicle     : %s %s
-		        Vehicle No  : %s
-		        City        : %s
-
-		        You can now start accepting ride requests from customers.
-
-		        Drive safe and earn more with RideWithUs 🚗💰
-
-		        Regards,
-		        RideWithUs Team
-		        """.formatted(
-		        driver.getDriverName(),
-		        driver.getDriverName(),
-		        driver.getMobileNumber(),   // ✅ %s
-		        vehicle.getBrandName(),
-		        vehicle.getModal(),
-		        vehicle.getVehicleNumber(),
-		        vehicle.getCity()
-		);
-
-
-        mailService.sendMail(driver.getMailID(), subject, message);
+//		String subject = "Welcome to RideWithUs – Driver Registration Successful";
+//
+//		String message = """
+//		        Hello %s,
+//
+//		        Congratulations! 🎉
+//		        You have been successfully registered as a driver with RideWithUs.
+//
+//		        Driver Details:
+//		        ------------------------
+//		        Name        : %s
+//		        Mobile No   : %s
+//		        Vehicle     : %s %s
+//		        Vehicle No  : %s
+//		        City        : %s
+//
+//		        You can now start accepting ride requests from customers.
+//
+//		        Drive safe and earn more with RideWithUs 🚗💰
+//
+//		        Regards,
+//		        RideWithUs Team
+//		        """.formatted(
+//		        driver.getDriverName(),
+//		        driver.getDriverName(),
+//		        driver.getMobileNumber(),   // ✅ %s
+//		        vehicle.getBrandName(),
+//		        vehicle.getModal(),
+//		        vehicle.getVehicleNumber(),
+//		        vehicle.getCity()
+//		);
+//
+//
+//        mailService.sendMail(driver.getMailID(), subject, message);
 		
 		return new ResponseEntity<ResponseStructure<Driver>>(responseStructure,HttpStatus.ACCEPTED);
 		
