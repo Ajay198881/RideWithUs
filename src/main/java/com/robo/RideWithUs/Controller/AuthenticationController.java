@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.robo.RideWithUs.DTO.CustomerRegisterDTO;
 import com.robo.RideWithUs.DTO.LoginDTO;
+import com.robo.RideWithUs.DTO.LoginResponseDTO;
 import com.robo.RideWithUs.DTO.RegisterDriverVehicleDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.Entity.Customer;
@@ -32,7 +33,7 @@ public class AuthenticationController {
 	DriverService driverService;
 
 	@PostMapping("/login")
-	public ResponseEntity<ResponseStructure<String>> Login(@RequestBody LoginDTO logindto) {
+	public ResponseEntity<ResponseStructure<LoginResponseDTO>> Login(@RequestBody LoginDTO logindto) {
 		
 		return loginservice.login(logindto);
 	}

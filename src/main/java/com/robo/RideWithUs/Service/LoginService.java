@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.robo.RideWithUs.DTO.LoginDTO;
+import com.robo.RideWithUs.DTO.LoginResponseDTO;
 import com.robo.RideWithUs.DTO.ResponseStructure;
 import com.robo.RideWithUs.Entity.Customer;
 import com.robo.RideWithUs.Entity.Driver;
@@ -38,7 +39,7 @@ public class LoginService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<ResponseStructure<String>> login(LoginDTO logindto) {
+    public ResponseEntity<ResponseStructure<LoginResponseDTO>> login(LoginDTO logindto) {
 
         User user = userRepository.findByMobileNumber(logindto.getMobileNumber())
                 .orElseThrow(()-> new UserNotFoundWithThisMobileNumberException());
@@ -69,11 +70,15 @@ public class LoginService {
             throw new InValidRoleException();
         }
 
-        ResponseStructure<String> response = new ResponseStructure<>();
+        LoginResponseDTO responseDTO = new LoginResponseDTO();
+        responseDTO.setToken(token);
+        responseDTO.setRole(user.getRole());     // CUSTOMER / DRIVER
+        
+        ResponseStructure<LoginResponseDTO> response = new ResponseStructure<>();
         response.setStatusCode(HttpStatus.OK.value());
         response.setMessage("Bearer Token Generated Successfully");
-        response.setData(token);
+        response.setData(responseDTO);
 
-        return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.OK);
+        return new ResponseEntity<ResponseStructure<LoginResponseDTO>>(response, HttpStatus.OK);
     }
 }
