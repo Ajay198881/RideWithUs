@@ -1,5 +1,6 @@
 package com.robo.RideWithUs.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,68 +95,83 @@ public class CustomerService {
 	}
 
 	// ---------------- AVAILABLE VEHICLES ----------------
-	public ResponseEntity<ResponseStructure<AvailableVehicleDTO>> seeAllAvailableVehicles(String mobileNumber,
-			String city) {
+	public ResponseEntity<ResponseStructure<AvailableVehicleDTO>> seeAllAvailableVehicles(
+	        String mobileNumber, String city) {
 
-		Customer customer = customerRepository.findByMobileNumber(mobileNumber)
-				.orElseThrow(CustomerNotFoundWithThisMobileNumberException::new);
+	    Customer customer = customerRepository.findByMobileNumber(mobileNumber)
+	            .orElseThrow(()->new CustomerNotFoundWithThisMobileNumberException());
 
-		if (customer.isActiveBookingFlag()) {
-			throw new IllegalStateException("You already have an active booking");
-		}
+	    if (customer.isActiveBookingFlag()) {
+	        throw new IllegalStateException("You already have an active booking");
+	    }
 
-		String customerLocation = customer.getCustomerCurrentLocation();
+	    String customerLocation = customer.getCustomerCurrentLocation();
 
-		DestinationLocationResponse dest = getLocation.getCoordinates1(city);
-		DestinationLocationResponse source = getLocation.getCoordinates2(customerLocation);
+	    DestinationLocationResponse dest = getLocation.getCoordinates1(city);
+	    DestinationLocationResponse source = getLocation.getCoordinates2(customerLocation);
 
-		if (dest == null || source == null) {
-			throw new LocationNotFoundException();
-		}
+	    if (dest == null || source == null) {
+	        throw new LocationNotFoundException();
+	    }
 
-		Distance_Duration_Response distanceResponse = distanceService.getDistanceAndDuration(source.getLatitude(),
-				source.getLongitude(), dest.getLatitude(), dest.getLongitude());
+	    Distance_Duration_Response distanceResponse =
+	            distanceService.getDistanceAndDuration(
+	                    source.getLatitude(),
+	                    source.getLongitude(),
+	                    dest.getLatitude(),
+	                    dest.getLongitude()
+	            );
 
-		double distanceKm = distanceResponse.getDistanceInKm();
+	    double distanceKm = distanceResponse.getDistanceInKm();
 
-		AvailableVehicleDTO dto = new AvailableVehicleDTO();
-		dto.setCustomer(customer);
-		dto.setSourceLocation(customerLocation);
-		dto.setDestinationLocation(city);
-		dto.setDistance(distanceKm);
+	    AvailableVehicleDTO dto = new AvailableVehicleDTO();
+	    dto.setCustomer(customer);
+	    dto.setSourceLocation(customerLocation);
+	    dto.setDestinationLocation(city);
+	    dto.setDistance(distanceKm);
 
-		List<Vehicle> vehicles = vehicleRepository.findByCityAndAvailabilityStatus(customerLocation, "AVAILABLE");
+	    // ✅ IMPORTANT
+	    dto.setAvailableVehicleDetails(new ArrayList<>());
 
-		for (Vehicle v : vehicles) {
+	    // ✅ FETCH VEHICLES BY DESTINATION CITY
+	    List<Vehicle> vehicles =
+	            vehicleRepository.findByCityAndAvailabilityStatus(city, "AVAILABLE");
 
-			if (v.getDriver() == null || !v.getDriver().getStatus().equalsIgnoreCase("ACTIVE"))
-				continue;
+	    for (Vehicle v : vehicles) {
 
-			VehicleDetail detail = new VehicleDetail();
+	        if (v.getDriver() == null ||
+	            !v.getDriver().getStatus().equalsIgnoreCase("ACTIVE")) {
+	            continue;
+	        }
 
-			double fare = v.getPricePerKM() * distanceKm;
-			detail.setFare((int) Math.round(fare));
+	        VehicleDetail detail = new VehicleDetail();
 
-			if (v.getAverageSpeed() <= 0) {
-				detail.setEstimatedTime(-1);
-				detail.setEstimatedTimeString("N/A");
-			} else {
-				int minutes = (int) ((distanceKm / v.getAverageSpeed()) * 60);
-				detail.setEstimatedTime(minutes);
-				detail.setEstimatedTimeString((minutes / 60) + " hours " + (minutes % 60) + " minutes");
-			}
+	        double fare = v.getPricePerKM() * distanceKm;
+	        detail.setFare((int) Math.round(fare));
 
-			detail.setVehicle(v);
-			dto.getAvailableVehicleDetails().add(detail);
-		}
+	        if (v.getAverageSpeed() <= 0) {
+	            detail.setEstimatedTime(-1);
+	            detail.setEstimatedTimeString("N/A");
+	        } else {
+	            int minutes = (int) ((distanceKm / v.getAverageSpeed()) * 60);
+	            detail.setEstimatedTime(minutes);
+	            detail.setEstimatedTimeString(
+	                    (minutes / 60) + " hours " + (minutes % 60) + " minutes"
+	            );
+	        }
 
-		ResponseStructure<AvailableVehicleDTO> response = new ResponseStructure<>();
-		response.setStatusCode(HttpStatus.OK.value());
-		response.setMessage("Available vehicles fetched successfully");
-		response.setData(dto);
+	        detail.setVehicle(v);
+	        dto.getAvailableVehicleDetails().add(detail);
+	    }
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+	    ResponseStructure<AvailableVehicleDTO> response = new ResponseStructure<>();
+	    response.setStatusCode(HttpStatus.OK.value());
+	    response.setMessage("Available vehicles fetched successfully");
+	    response.setData(dto);
+
+	    return ResponseEntity.ok(response);
 	}
+
 
 	// ---------------- ACTIVE BOOKING ----------------
 	public ResponseEntity<ResponseStructure<ActiveBookingDTO>> seeActiveBooking(String mobileNo) {
