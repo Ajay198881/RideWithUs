@@ -169,7 +169,7 @@ public class CustomerService {
 	    response.setMessage("Available vehicles fetched successfully");
 	    response.setData(dto);
 
-	    return ResponseEntity.ok(response);
+	    return new ResponseEntity<ResponseStructure<AvailableVehicleDTO>>(response,HttpStatus.OK);
 	}
 
 
