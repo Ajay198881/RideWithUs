@@ -293,14 +293,7 @@ public class GlobalExceptions {
 	    return new ResponseEntity<ResponseStructure<String>>(response, HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
 	}
 	
-	@ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ResponseStructure<String>> handleIllegalState(IllegalStateException ex) {
-        ResponseStructure<String> rs = new ResponseStructure<>();
-        rs.setStatusCode(400);
-        rs.setMessage(ex.getMessage());
-        rs.setData(null);
-        return ResponseEntity.badRequest().body(rs);
-    }
+	
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseStructure<String>> handleGeneric(Exception ex) {
