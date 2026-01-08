@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,7 @@ import com.robo.RideWithUs.security.JwtFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
 	  @Autowired
@@ -29,8 +31,8 @@ public class SecurityConfiguration {
 	            .authorizeHttpRequests(auth -> auth
 	                .requestMatchers("/auth/**").permitAll()
 	                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
-	                .requestMatchers("/customer/**").hasRole("CUSTOMER")
-	                .requestMatchers("/driver/**").hasRole("DRIVER")
+	                .requestMatchers("/customer/**").authenticated()
+	                .requestMatchers("/driver/**").authenticated()
 	                .anyRequest().authenticated()
 	            )
 	            .sessionManagement(session ->
