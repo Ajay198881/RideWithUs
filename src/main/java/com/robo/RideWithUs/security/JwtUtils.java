@@ -27,9 +27,9 @@ public class JwtUtils {
     }
 
     // Generate token
-    public String generateToken(String username, String role) {
+    public String generateToken(String mobileNumber, String role) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(mobileNumber)
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))

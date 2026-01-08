@@ -57,14 +57,14 @@ public class LoginService {
             Customer customer = customerRepository.findByMobileNumber(user.getMobileNumber())
                     .orElseThrow(()-> new CustomerNotFoundException());
 
-            token = jwtUtil.generateToken(customer.getCustomerName(), user.getRole());
+            token = jwtUtil.generateToken(customer.getMobileNumber(), user.getRole());
 
         } else if ("DRIVER".equals(user.getRole())) {
 
             Driver driver = driverRepository.findByMobileNumber(user.getMobileNumber())
                     .orElseThrow(() -> new DriverNotFoundException());
 
-            token = jwtUtil.generateToken(driver.getDriverName(), user.getRole());
+            token = jwtUtil.generateToken(driver.getMobileNumber(), user.getRole());
 
         } else {
             throw new InValidRoleException();
